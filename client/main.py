@@ -2,7 +2,6 @@ from socket import *
 from video_player import VideoPlayer
 from interface import Interface
 import threading
-import logging
 
 serverName = 'localhost'
 serverPort = 6000
@@ -18,20 +17,18 @@ def menu(option):
       vp.run()
 
 def createConnection(name):
-    logging.info("Thread %s: starting", name)
+    print('Iniciando cliente...') 
     while True:
         try:     
-            print('Aguardando uma resposta...')   
             sentence, addr = clientSocket.recvfrom(1024)
             print('Recebeu', sentence)
-            # userInterface.menu(sentence)
+            menu(sentence)
         except: 
             print("Houve um problema!") 
             clientSocket.close()
             break
 
 def createUI(name):
-    logging.info("Thread %s: starting", name)
     userInterface = Interface(clientSocket, (serverName, serverPort))
     userInterface.run()
 
