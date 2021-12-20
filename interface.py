@@ -1,13 +1,17 @@
 from tkinter import * 
 
+COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
+
 class Interface:
-  def __init__(self):
+  def __init__(self, socket, address):
+    self.socket = socket
+    self.address = address
+
     self.root = Tk() 
     
     self.fontePadrao = ("Arial", "10")
-    self.primeiroContainer = Frame(self.root)
-    self.primeiroContainer["pady"] = 10
-    self.primeiroContainer.pack()
+
+    self.primeiroContainer = self.createContainer(10)
 
     self.segundoContainer = Frame(self.root)
     self.segundoContainer["padx"] = 20
@@ -17,43 +21,40 @@ class Interface:
     self.terceiroContainer["padx"] = 20
     self.terceiroContainer.pack()
 
-    self.quartoContainer = Frame(self.root)
-    self.quartoContainer["pady"] = 20
-    self.quartoContainer.pack()
+    self.quartoContainer = self.createContainer(20)
 
-    self.titulo = Label(self.primeiroContainer, text="Dados do usuário")
-    self.titulo["font"] = ("Arial", "10", "bold")
-    self.titulo.pack()
+    self.createTitle(self.primeiroContainer, "Serviço de Streaming")
 
-    self.nomeLabel = Label(self.segundoContainer,text="Nome", font=self.fontePadrao)
-    self.nomeLabel.pack(side=LEFT)
-
-    self.nome = Entry(self.segundoContainer)
-    self.nome["width"] = 30
-    self.nome["font"] = self.fontePadrao
-    self.nome.pack(side=LEFT)
-
-    self.senhaLabel = Label(self.terceiroContainer, text="Senha", font=self.fontePadrao)
-    self.senhaLabel.pack(side=LEFT)
-
-    self.senha = Entry(self.terceiroContainer)
-    self.senha["width"] = 30
-    self.senha["font"] = self.fontePadrao
-    self.senha["show"] = "*"
-    self.senha.pack(side=LEFT)
-
-    self.autenticar = Button(self.quartoContainer)
-    self.autenticar["text"] = "Autenticar"
-    self.autenticar["font"] = ("Calibri", "8")
-    self.autenticar["width"] = 12
-    self.autenticar["command"] = self.verificaSenha
-    self.autenticar.pack()
+    self.createBtn(self.segundoContainer, "Listar Vídeos", self.getVideos)
+    self.createBtn(self.terceiroContainer, "Exibir Vídeo", self.runVideo)
 
     self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
     self.mensagem.pack()
 
-  def verificaSenha(self):
-    print("Clicou")
+  def createContainer(self, pady): 
+    container = Frame(self.root)
+    container["pady"] = pady
+    container.pack()
+    return container
+
+  def createTitle(self, container, text):
+    title = Label(container, text=text)
+    title["font"] = ("Arial", "10", "bold")
+    title.pack()
+
+  def createBtn(self, container, text, command): 
+    btn = Button(container)
+    btn["text"] = text
+    btn["font"] = ("Calibri", "8")
+    btn["width"] = 12
+    btn["command"] = command
+    btn.pack()
+
+  def getVideos(self):
+    self.socket.sendto(COMMANDS[0], self.address)
+  
+  def runVideo(self):
+    self.socket.sendto(COMMANDS[1], self.address)
 
   def run(self):
     self.root.mainloop()
