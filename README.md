@@ -8,7 +8,10 @@ brew install portaudio
 brew install python-tk
 `
 
-### Depdencias 
+### Dependencias 
 pip install opencv-python
 pip install pyaudio
 pip install tk
+pip install tkVideoPlayer
+
+export DISPLAY=:0

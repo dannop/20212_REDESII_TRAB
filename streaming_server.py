@@ -4,19 +4,23 @@ serverName = 'localhost'
 serverPort = 6000
 serversocket = socket(AF_INET, SOCK_DGRAM)
 
-COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
+CLIENT_COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
+SERVER_COMMANDS = [b"LISTA_DE_VIDEOS", b"REPRODUZINDO_O_VIDEO"]
 
 serversocket.bind((serverName, serverPort))
 
 print('O servidor está online...')
 
 while True:
-    sentence, addr = serversocket.recvfrom(1024)
-    print('Recebeu', sentence)
+    try:  
+        sentence, addr = serversocket.recvfrom(1024)
+        print('Recebeu', sentence)
 
-    if (sentence == COMMANDS[0]): 
-        serversocket.sendto(b"LISTA_DE_VIDEOS", addr)
-    if (sentence == COMMANDS[1]): 
-        serversocket.sendto(b"REPRODUZINDO_O_viDEO", addr)
-
-serversocket.close()
+        if (sentence == CLIENT_COMMANDS[0]): 
+            serversocket.sendto(SERVER_COMMANDS[0], addr)
+        elif (sentence == CLIENT_COMMANDS[1]): 
+            serversocket.sendto(SERVER_COMMANDS[1], addr)
+    except: 
+        print("Houve um problema no servidor!") 
+        serversocket.close()
+        break

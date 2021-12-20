@@ -1,6 +1,6 @@
 from tkinter import * 
 
-COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
+CLIENT_COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
 
 class Interface:
   def __init__(self, socket, address):
@@ -51,10 +51,10 @@ class Interface:
     btn.pack()
 
   def getVideos(self):
-    self.socket.sendto(COMMANDS[0], self.address)
-  
+    self.socket.sendto(CLIENT_COMMANDS[0], self.address)
+    
   def runVideo(self):
-    self.socket.sendto(COMMANDS[1], self.address)
+    self.socket.sendto(CLIENT_COMMANDS[1], self.address)
 
   def run(self):
     self.root.mainloop()

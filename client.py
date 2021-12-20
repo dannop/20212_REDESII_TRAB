@@ -1,33 +1,50 @@
 from socket import *
 from video_player import VideoPlayer
 from interface import Interface
+import threading
+import logging
 
 serverName = 'localhost'
 serverPort = 6000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-aux = 0
-
-COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
-
-while True:     
-    # if (aux == 0): 
-    #     clientSocket.sendto(COMMANDS[0], (serverName, serverPort))
-    #     aux += 1
+SERVER_COMMANDS = [b"LISTA_DE_VIDEOS", b"REPRODUZINDO_O_VIDEO"]
     
-    # if (aux == 1): 
-    #     clientSocket.sendto(COMMANDS[1], (serverName, serverPort))
-    #     aux += 1
+def menu(option):
+    if (option == SERVER_COMMANDS[0]): 
+      print('Lista de Videos')
+    elif (option == SERVER_COMMANDS[1]):
+      vp = VideoPlayer("videos/sao/open-480p.mp4")
+      vp.run()
 
-    print('Aguardando uma resposta...')   
-    sentence, addr = clientSocket.recvfrom(1024)
-    print('Recebeu', sentence)
+def createConnection(name):
+    logging.info("Thread %s: starting", name)
+    while True:
+        try:     
+            print('Aguardando uma resposta...')   
+            sentence, addr = clientSocket.recvfrom(1024)
+            print('Recebeu', sentence)
+            # userInterface.menu(sentence)
+        except: 
+            print("Houve um problema!") 
+            clientSocket.close()
+            break
 
-    user_interface = Interface(clientSocket, (serverName, serverPort))
-    user_interface.run()
+def createUI(name):
+    logging.info("Thread %s: starting", name)
+    userInterface = Interface(clientSocket, (serverName, serverPort))
+    userInterface.run()
 
-    if (sentence == b"REPRODUZINDO_O_viDEO"):
-        vp = VideoPlayer("videos/sao/open-480p.mp4")
-        vp.run()
+def createThread(threads, target, index):
+    thr = threading.Thread(target=target, args=(index,))
+    threads.append(thr)
+    thr.start()
 
-clientSocket.close()
+if __name__ == "__main__":
+
+    threads = list()
+    createThread(threads, createConnection, 0)
+    createThread(threads, createUI, 1)
+
+    for index, thread in enumerate(threads):
+        thread.join()
