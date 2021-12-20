@@ -1,7 +1,8 @@
 from socket import *
 from video_player import VideoPlayer
+from interface import Interface
 
-serverName = ''
+serverName = 'localhost'
 serverPort = 6000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
@@ -10,6 +11,9 @@ aux = 0
 COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
 
 while True: 
+    user_interface = Interface()
+    user_interface.run()
+    
     if (aux == 0): 
         clientSocket.sendto(COMMANDS[0], (serverName, serverPort))
         aux += 1
