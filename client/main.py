@@ -32,9 +32,7 @@ def createConnection():
             print("Houve um problema!", e) 
             clientSocket.close()
             userInterface.stop()
-            
-            for thread in threads:
-                thread.join()
+        
             
 
 def createUI():
@@ -52,5 +50,8 @@ if __name__ == "__main__":
 
     userInterface.showBegin()
     userInterface.run()
+
+    for thread in threads:
+        thread.join()
     
     sys.exit()

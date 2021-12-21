@@ -1,3 +1,4 @@
+import sys
 import general
 from tkinter import * 
 from functools import partial
@@ -15,6 +16,8 @@ class Interface:
     self.createTitle(self.header, "Olá, Cliente")
 
     self.body = self.createContainer(20, 0)
+
+    self.videos = []
 
   def clearBody(self):
     for widgets in self.body.winfo_children():
@@ -53,15 +56,27 @@ class Interface:
   def showBegin(self):
     self.clearBody()
     self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
+    self.createBtn(self.body, "Sair", self.stop)
 
   def showVideos(self, videos): 
+    self.videos = videos
     self.clearBody()
     self.createBtn(self.body, "Voltar", self.showBegin)
     for video in videos: 
-      self.createBtn(self.body, video.name, self.runVideo, video)
+      self.createBtn(self.body, video.name, self.showSelectQuality, video)
+
+  def showSelectQuality(self, video): 
+    self.clearBody()
+    self.createBtn(self.body, "Voltar", self.showVideos, self.videos)
+    self.createBtn(self.body, '240p', self.runVideo, [video, '240p'])
+    self.createBtn(self.body, '480p', self.runVideo, [video, '480p'])
+    self.createBtn(self.body, '720p', self.runVideo, [video, '720p'])  
 
   def run(self):
     self.root.mainloop()
   
   def stop(self):
-    self.root.quit()
+    print("Ate a proxima!")
+    self.socket.close()
+    self.root.destroy()
+    sys.exit()

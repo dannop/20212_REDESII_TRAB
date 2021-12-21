@@ -18,21 +18,28 @@ videos.append(Video('Matrix', 17200, "videos/matrix/"))
 all_processes = list()
 
 def stream(video, addr, serversocket):
-    cap = cv2.VideoCapture(video.getHighQuality())
-    
-    if (not cap.isOpened()):
-      print("Error opening video stream or file")
-    
-    while (cap.isOpened()):
-        ret, frame = cap.read()
-        if ret == True:
-            # resize = cv2.resize(frame, (500, 250))
-            general.formatSendFrameTo(serversocket, general.SERVER_COMMANDS[1], frame, addr)
-            # time.sleep(0.1)
-        else:
-            break
+    cap = None
 
-    cap.release()
+    if video[1] == '240p':
+        cap = cv2.VideoCapture(video[0].getLowQuality())
+    elif video[1] == '240p':
+        cap = cv2.VideoCapture(video[0].getMediumQuality())
+    else:
+        cap = cv2.VideoCapture(video[0].getHighQuality())
+    
+    if (cap):
+        if (not cap.isOpened()):
+            print("Error opening video stream or file")
+        
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                general.formatSendFrameTo(serversocket, general.SERVER_COMMANDS[1], frame, addr)
+                time.sleep(0.1)
+            else:
+                break
+
+        cap.release()
 
 def createConnection():
     print('O servidor está online...')
