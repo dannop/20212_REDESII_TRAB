@@ -51,8 +51,7 @@ def createConnection():
             elif (data_variable[0] == general.CLIENT_COMMANDS[2]): 
                 process = all_processes[len(all_processes)-1]
                 process.terminate()
-                general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)
-                    
+                general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)   
 
         except Exception as e: 
             print("Houve um problema no servidor!", e) 
@@ -60,4 +59,5 @@ def createConnection():
             break
 
 if __name__ == "__main__":
+    
     createConnection()
