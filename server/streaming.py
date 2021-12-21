@@ -18,7 +18,7 @@ videos.append(Video('Matrix', 17200, "videos/matrix/"))
 all_processes = list()
 
 def stream(video, addr, serversocket):
-    cap = cv2.VideoCapture(video.getLowQuality())
+    cap = cv2.VideoCapture(video.getHighQuality())
     
     if (not cap.isOpened()):
       print("Error opening video stream or file")
@@ -26,9 +26,9 @@ def stream(video, addr, serversocket):
     while (cap.isOpened()):
         ret, frame = cap.read()
         if ret == True:
-            resize = cv2.resize(frame, (200, 100))
-            general.formatSendTo(serversocket, general.SERVER_COMMANDS[1], resize, addr)
-            time.sleep(0.1)
+            # resize = cv2.resize(frame, (500, 250))
+            general.formatSendFrameTo(serversocket, general.SERVER_COMMANDS[1], frame, addr)
+            # time.sleep(0.1)
         else:
             break
 
@@ -40,7 +40,7 @@ def createConnection():
         try:   
             data, addr = serversocket.recvfrom(64*1024)
             data_variable = pickle.loads(data)
-            print('Recebeu', data_variable)
+            print('Recebeu', data_variable[0])
 
             if (data_variable[0] == general.CLIENT_COMMANDS[0]): 
                 general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)

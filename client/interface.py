@@ -11,8 +11,14 @@ class Interface:
     self.root.title("Trabalho - Redes II")
     self.root.geometry("500x500")
 
-    self.primeiroContainer = self.createContainer(0, 10)
-    self.createTitle(self.primeiroContainer, "Olá, Cliente")
+    self.header = self.createContainer(0, 10)
+    self.createTitle(self.header, "Olá, Cliente")
+
+    self.body = self.createContainer(20, 0)
+
+  def clearBody(self):
+    for widgets in self.body.winfo_children():
+      widgets.destroy()
 
   def createContainer(self, padx, pady): 
     container = Frame(self.root)
@@ -45,13 +51,14 @@ class Interface:
     general.formatSendTo(self.socket, general.CLIENT_COMMANDS[1], video, self.address)
 
   def showBegin(self):
-    container = self.createContainer(20, 0)
-    self.createBtn(container, "Atualizar Vídeos", self.getVideos)
+    self.clearBody()
+    self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
 
   def showVideos(self, videos): 
-    container = self.createContainer(20, 0)
+    self.clearBody()
+    self.createBtn(self.body, "Voltar", self.showBegin)
     for video in videos: 
-      self.createBtn(container, video.name, self.runVideo, video)
+      self.createBtn(self.body, video.name, self.runVideo, video)
 
   def run(self):
     self.root.mainloop()

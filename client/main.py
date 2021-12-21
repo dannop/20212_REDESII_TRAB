@@ -1,10 +1,11 @@
 import sys
 import general
 import pickle
-from socket import *
-import cv2
-from interface import Interface
 import threading
+import zlib
+from socket import *
+from interface import Interface
+from video_player import VideoPlayer
 
 serverName = '192.168.1.103'
 serverPort = 6000
@@ -18,23 +19,22 @@ def createConnection():
     while True:
         try:     
             data, addr = clientSocket.recvfrom(64*1024)
-            data_variable = pickle.loads(data)
-            print('Recebeu', data_variable)
+            data_decompressed = zlib.decompress(data)
+            data_variable = pickle.loads(data_decompressed)
+            print('Recebeu', data_variable[0])
 
             if (data_variable[0] == general.SERVER_COMMANDS[0]):
-                print(userInterface) 
                 userInterface.showVideos(data_variable[1])
             elif (data_variable[0] == general.SERVER_COMMANDS[1]):
-                cv2.imshow('Streaming', data_variable[1])
-
-                if cv2.waitKey(60) & 0xFF == ord('q'):
-                    general.formatSendTo(clientSocket, general.CLIENT_COMMANDS[2], None, addr)
-                    cv2.destroyAllWindows()
+                VideoPlayer.runStream(clientSocket, data_variable[1], addr)
 
         except Exception as e: 
             print("Houve um problema!", e) 
             clientSocket.close()
             userInterface.stop()
+            
+            for thread in threads:
+                thread.join()
             
 
 def createUI():
@@ -52,8 +52,5 @@ if __name__ == "__main__":
 
     userInterface.showBegin()
     userInterface.run()
-
-    for thread in threads:
-        thread.join()
     
     sys.exit()

@@ -1,12 +1,12 @@
+import general
 import cv2
 import pyaudio
 import wave
+import base64
+import numpy as np
 
 class VideoPlayer:
-  def __init__(self, path):
-    self.path = path
-
-  def Audio_play(self):
+  def Audio_play():
     CHUNK = 1024
 
     wf = wave.open(self.path, 'rb')
@@ -29,21 +29,12 @@ class VideoPlayer:
     del data
     pa.terminate()
 
-  def run(self):
-    # self.Audio_play()
-    cap = cv2.VideoCapture(self.path)
-    
-    if (cap.isOpened()== False):
-      print("Error opening video stream or file")
-    
-    while(cap.isOpened()):
-      ret, frame = cap.read()
-      if ret == True:
-        cv2.imshow('Streaming', frame)
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-          break
-      else:
-        break
-    
-    cap.release()
-    cv2.destroyAllWindows()
+  def runStream(socket, frame_formated, addr):
+    frame_decoded = base64.b64decode(frame_formated)
+    np_data = np.fromstring(frame_decoded, dtype = np.uint8)
+    frame = cv2.imdecode(np_data, 1)
+    cv2.imshow('Streaming', frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        general.formatSendTo(socket, general.CLIENT_COMMANDS[2], None, addr)
+        cv2.destroyAllWindows()
