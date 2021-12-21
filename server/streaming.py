@@ -8,8 +8,8 @@ import multiprocessing
 
 serverName = '192.168.1.103'
 serverPort = 6000
-serversocket = socket(AF_INET, SOCK_DGRAM)
-serversocket.bind((serverName, serverPort))
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind((serverName, serverPort))
 
 videos = []
 videos.append(Video('Batman', 14300, "videos/batman/"))
@@ -17,7 +17,7 @@ videos.append(Video('Matrix', 17200, "videos/matrix/"))
 
 all_processes = list()
 
-def stream(video, addr, serversocket):
+def stream(video, addr, serverSocket):
     cap = None
 
     if video[1] == '240p':
@@ -34,7 +34,7 @@ def stream(video, addr, serversocket):
         while (cap.isOpened()):
             ret, frame = cap.read()
             if ret == True:
-                general.formatSendFrameTo(serversocket, general.SERVER_COMMANDS[1], frame, addr)
+                general.formatSendFrameTo(serverSocket, general.SERVER_COMMANDS[1], frame, addr)
                 time.sleep(0.1)
             else:
                 break
@@ -45,24 +45,24 @@ def createConnection():
     print('O servidor está online...')
     while True:
         try:   
-            data, addr = serversocket.recvfrom(64*1024)
+            data, addr = serverSocket.recvfrom(64*1024)
             data_variable = pickle.loads(data)
             print('Recebeu', data_variable[0])
 
             if (data_variable[0] == general.CLIENT_COMMANDS[0]): 
-                general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)
+                general.formatSendTo(serverSocket, general.SERVER_COMMANDS[0], videos, addr)
             elif (data_variable[0] == general.CLIENT_COMMANDS[1]): 
-                process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, serversocket))
+                process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, serverSocket))
                 all_processes.append(process)
                 process.start()
             elif (data_variable[0] == general.CLIENT_COMMANDS[2]): 
                 process = all_processes[len(all_processes)-1]
                 process.terminate()
-                general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)   
+                general.formatSendTo(serverSocket, general.SERVER_COMMANDS[0], videos, addr)   
 
         except Exception as e: 
             print("Houve um problema no servidor!", e) 
-            serversocket.close()
+            serverSocket.close()
             break
 
 if __name__ == "__main__":

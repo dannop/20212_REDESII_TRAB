@@ -32,12 +32,6 @@ def createConnection():
             print("Houve um problema!", e) 
             clientSocket.close()
             userInterface.stop()
-        
-            
-
-def createUI():
-    userInterface = Interface(clientSocket, (serverName, serverPort))
-    userInterface.run()
 
 def createThread(threads, target):
     thr = threading.Thread(target=target, args=())
