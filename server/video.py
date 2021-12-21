@@ -4,11 +4,11 @@ class Video:
     self.time = time
     self.path = path
 
-  def getMinimunQuality(self):
-    return self.path + '240.mp4'
+  def getLowQuality(self):
+    return self.path + '240p.mp4'
 
   def getMediumQuality(self):
-    return self.path + '480.mp4'
+    return self.path + '480p.mp4'
 
   def getHighQuality(self):
-    return self.path + '720.mp4'
+    return self.path + '720p.mp4'
