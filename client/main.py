@@ -1,30 +1,33 @@
 import sys
+import general
 import pickle
 from socket import *
 from video_player import VideoPlayer
+import cv2
 from interface import Interface
 import threading
 
-serverName = 'localhost'
+serverName = '192.168.56.1'
 serverPort = 6000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 threads = list()
-
-SERVER_COMMANDS = ["LISTA_DE_VIDEOS", "REPRODUZINDO_O_VIDEO"]
     
 def createConnection(name):
     print('Iniciando cliente...') 
     while True:
         try:     
-            data, addr = clientSocket.recvfrom(1024)
+            data, addr = clientSocket.recvfrom(64*1024)
             data_variable = pickle.loads(data)
             print('Recebeu', data_variable)
 
-            if (data_variable[0] == SERVER_COMMANDS[0]): 
+            if (data_variable[0] == general.SERVER_COMMANDS[0]): 
                 print('Lista de Videos')
-            elif (data_variable[0] == SERVER_COMMANDS[1]):
-                vp = VideoPlayer("../server/videos/matrix/480p.mp4")
-                vp.run()
+            elif (data_variable[0] == general.SERVER_COMMANDS[1]):
+                cv2.imshow('Streaming', data_variable[1])
+
+                if cv2.waitKey(60) & 0xFF == ord('q'):
+                    general.formatSendTo(clientSocket, general.CLIENT_COMMANDS[2], None, (serverName, serverPort))
+                    cv2.destroyAllWindows()
 
         except Exception as e: 
             print("Houve um problema!", e) 
