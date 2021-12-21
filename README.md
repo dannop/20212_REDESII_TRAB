@@ -43,14 +43,20 @@ python3 main.py
 ## LOGS DE APLICAÇÃO:
 
 Iniciamos o SERVIDOR de STREAMING (streaming.py);
+
 Servidor inicializa um socket UDP na porta 6000;
+
 Imprime no terminal “O servidor está online. . .”;
+
 Significa que está à espera de mensagens UDP dos CLIENTES;
 
 Iniciamos o CLIENTE (main.py);
+
 É criada a conexão com o SERVIDOR na porta 6000;
+
 Imprime no terminal “O cliente está online. . .”;
-Iniciada a Interface do Usuário.
+
+Iniciada a Interface do Usuário;
 
 Nela terá um botão de "Exibir Vídeos” que irá enviar uma mensagem “LISTAR_VIDEOS” do CLIENTE para o SERVIDOR;
 
