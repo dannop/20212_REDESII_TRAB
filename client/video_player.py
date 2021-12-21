@@ -30,7 +30,7 @@ class VideoPlayer:
     pa.terminate()
 
   def run(self):
-    self.Audio_play()
+    # self.Audio_play()
     cap = cv2.VideoCapture(self.path)
     
     if (cap.isOpened()== False):
@@ -40,7 +40,7 @@ class VideoPlayer:
       ret, frame = cap.read()
       if ret == True:
         cv2.imshow('Streaming', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(25) & 0xFF == ord('q'):
           break
       else:
         break

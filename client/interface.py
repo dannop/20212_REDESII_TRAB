@@ -58,3 +58,6 @@ class Interface:
 
   def run(self):
     self.root.mainloop()
+  
+  def stop(self):
+    self.root.quit()
