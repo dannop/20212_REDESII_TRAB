@@ -6,7 +6,7 @@ import cv2
 from interface import Interface
 import threading
 
-serverName = '192.168.56.1'
+serverName = '192.168.1.103'
 serverPort = 6000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 threads = list()
