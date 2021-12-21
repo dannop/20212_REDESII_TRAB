@@ -51,8 +51,7 @@ class Interface:
   def showVideos(self, videos): 
     container = self.createContainer(20, 0)
     for video in videos: 
-      print(video.nome)
-      # self.createBtn(container, video.nome, self.runVideo, (video))
+      self.createBtn(container, video.name, self.runVideo, video)
 
   def run(self):
     self.root.mainloop()

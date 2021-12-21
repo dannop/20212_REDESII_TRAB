@@ -21,7 +21,8 @@ def createConnection():
             data_variable = pickle.loads(data)
             print('Recebeu', data_variable)
 
-            if (data_variable[0] == general.SERVER_COMMANDS[0]): 
+            if (data_variable[0] == general.SERVER_COMMANDS[0]):
+                print(userInterface) 
                 userInterface.showVideos(data_variable[1])
             elif (data_variable[0] == general.SERVER_COMMANDS[1]):
                 cv2.imshow('Streaming', data_variable[1])

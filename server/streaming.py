@@ -45,7 +45,7 @@ def createConnection():
             if (data_variable[0] == general.CLIENT_COMMANDS[0]): 
                 general.formatSendTo(serversocket, general.SERVER_COMMANDS[0], videos, addr)
             elif (data_variable[0] == general.CLIENT_COMMANDS[1]): 
-                process = multiprocessing.Process(target=stream, args=(videos[1], addr, serversocket))
+                process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, serversocket))
                 all_processes.append(process)
                 process.start()
             elif (data_variable[0] == general.CLIENT_COMMANDS[2]): 
