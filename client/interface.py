@@ -1,6 +1,7 @@
+import pickle
 from tkinter import * 
 
-CLIENT_COMMANDS = [b"LISTAR_VIDEOS", b"REPRODUZIR_VIDEO"]
+CLIENT_COMMANDS = ["LISTAR_VIDEOS", "REPRODUZIR_VIDEO"]
 
 class Interface:
   def __init__(self, socket, address):
@@ -51,10 +52,14 @@ class Interface:
     btn.pack()
 
   def getVideos(self):
-    self.socket.sendto(CLIENT_COMMANDS[0], self.address)
+    data = [CLIENT_COMMANDS[0], None]
+    data_string = pickle.dumps(data)
+    self.socket.sendto(data_string, self.address)
     
   def runVideo(self):
-    self.socket.sendto(CLIENT_COMMANDS[1], self.address)
+    data = [CLIENT_COMMANDS[1], None]
+    data_string = pickle.dumps(data)
+    self.socket.sendto(data_string, self.address)
 
   def run(self):
     self.root.mainloop()

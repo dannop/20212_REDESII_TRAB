@@ -1,4 +1,5 @@
 import sys
+import pickle
 from socket import *
 from video_player import VideoPlayer
 from interface import Interface
@@ -9,22 +10,22 @@ serverPort = 6000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 threads = list()
 
-SERVER_COMMANDS = [b"LISTA_DE_VIDEOS", b"REPRODUZINDO_O_VIDEO"]
+SERVER_COMMANDS = ["LISTA_DE_VIDEOS", "REPRODUZINDO_O_VIDEO"]
     
-def menu(option):
-    if (option == SERVER_COMMANDS[0]): 
-        print('Lista de Videos')
-    elif (option == SERVER_COMMANDS[1]):
-        vp = VideoPlayer("../server/videos/matrix/480p.mp4")
-        vp.run()
-
 def createConnection(name):
     print('Iniciando cliente...') 
     while True:
         try:     
-            sentence, addr = clientSocket.recvfrom(1024)
-            print('Recebeu', sentence)
-            menu(sentence)
+            data, addr = clientSocket.recvfrom(1024)
+            data_variable = pickle.loads(data)
+            print('Recebeu', data_variable)
+
+            if (data_variable[0] == SERVER_COMMANDS[0]): 
+                print('Lista de Videos')
+            elif (data_variable[0] == SERVER_COMMANDS[1]):
+                vp = VideoPlayer("../server/videos/matrix/480p.mp4")
+                vp.run()
+
         except Exception as e: 
             print("Houve um problema!", e) 
             clientSocket.close()
