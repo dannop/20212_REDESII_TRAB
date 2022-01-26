@@ -4,9 +4,11 @@ from tkinter import *
 from functools import partial
 
 class Interface:
-  def __init__(self, socket, address):
-    self.socket = socket
-    self.address = address
+  def __init__(self, server_socket, server_address, management_socket, management_address):
+    self.server_socket = server_socket
+    self.server_address = server_address
+    self.management_socket = management_socket
+    self.management_address = management_address
 
     self.root = Tk() 
     self.root.title("Trabalho - Redes II")
@@ -47,11 +49,15 @@ class Interface:
     btn["command"] = action_with_arg
     btn.pack()
 
-  def getVideos(self):
-    general.formatSendTo(self.socket, general.CLIENT_COMMANDS[0], None, self.address)
+  def accessApp(self):
+    self.management_socket.connect(self.management_address)
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], None)
 
+  def getVideos(self):
+    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
+    
   def runVideo(self, video):
-    general.formatSendTo(self.socket, general.CLIENT_COMMANDS[1], video, self.address)
+    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
 
   def showBegin(self):
     self.clearBody()
@@ -62,11 +68,11 @@ class Interface:
     self.clearBody()
     self.createTitle(self.body, "LOGIN")
     self.createTitle(self.body, "ID")
-    id = Entry(window).grid(row = 2,column = 0)
+    id = Entry(self.body).grid(row = 2,column = 0)
     var1 = IntVar()
-    Checkbutton(master, text="Convidado", variable=var1).grid(row=2, sticky=W)
+    Checkbutton(self.body, text="Convidado", variable=var1).grid(row=2, sticky=W)
     var2 = IntVar()
-    Checkbutton(master, text="Premium", variable=var2).grid(row=3, sticky=W)
+    Checkbutton(self.body, text="Premium", variable=var2).grid(row=3, sticky=W)
     self.createBtn(self.body, "Entrar", self.showOptions)
     self.createBtn(self.body, "Sair", self.stop)
   
@@ -110,7 +116,7 @@ class Interface:
     self.clearBody()
     self.createTitle(self.body, "NOVO GRUPO")
     self.createTitle(self.body, "NOME DO GRUPO")
-    newGroup = Entry(window).grid(row = 2,column = 0)
+    newGroup = Entry(self.body).grid(row = 2,column = 0)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showGroup(self):
@@ -122,13 +128,13 @@ class Interface:
   def showAddUser(self):
     self.clearBody()
     self.createTitle(self.body, "ID DO USUÁRIO PARA ADICIONAR:")
-    addUser = Entry(window).grid(row = 1,column = 0)
+    addUser = Entry(self.body).grid(row = 1,column = 0)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showRemoveUser(self):
     self.clearBody()
     self.createTitle(self.body, "ID DO USUÁRIO PARA REMOVER:")
-    removeUser = Entry(window).grid(row = 1,column = 0)
+    removeUser = Entry(self.body).grid(row = 1,column = 0)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def run(self):
@@ -136,6 +142,6 @@ class Interface:
   
   def stop(self):
     print("Ate a proxima!")
-    self.socket.close()
+    self.server_socket.close()
     self.root.destroy()
     sys.exit()
