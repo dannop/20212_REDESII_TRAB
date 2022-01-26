@@ -12,8 +12,6 @@ managementSocket.bind((serverName, managementPort))
 managementSocket.listen(5)
 
 users = []
-users.append(User(1, 'Daniel', 'Convidado'))
-users.append(User(1, 'Juliana', 'Premium'))
 
 def createConnection():
   print('O gerenciador está online...')

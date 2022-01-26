@@ -1,6 +1,5 @@
 class User:
-  def __init__(self, id, name, kind):
+  def __init__(self, id, kind):
     self.id = id
-    self.name = name
     self.kind = kind
     self.group_ids = []
