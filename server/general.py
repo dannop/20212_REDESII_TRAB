@@ -15,7 +15,6 @@ def formatSendTo(socket, message, data, addr):
     socket.sendto(data_compressed, addr)
 
 def formatTcpSendTo(socket, message, data):
-    print('socket', socket)
     data = [message, data]
     data_string = pickle.dumps(data)
     socket.send(data_string)

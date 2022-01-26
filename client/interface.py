@@ -2,6 +2,7 @@ import sys
 import general
 from tkinter import * 
 from functools import partial
+from users import User
 
 class Interface:
   def __init__(self, server_socket, server_address, management_socket, management_address):
@@ -15,11 +16,15 @@ class Interface:
     self.root.geometry("500x500")
 
     self.header = self.createContainer(0, 10)
-    self.createTitle(self.header, "Olá, Cliente")
+    self.createTitle(self.header, "")
 
     self.body = self.createContainer(20, 0)
 
     self.videos = []
+
+    self.current_user = None
+    self.user_id = None
+    self.user_kind = None
 
   def clearBody(self):
     for widgets in self.body.winfo_children():
@@ -49,31 +54,38 @@ class Interface:
     btn["command"] = action_with_arg
     btn.pack()
 
+  def createInput(self, container, value): 
+    input = Entry(container, textvariable = value)
+    input.pack()
+  
+  def createRadioOptions(self, container, variable, values): 
+    for (text, value) in values.items():
+      Radiobutton(container, text = text, variable = variable,
+                value = value, indicator = 0).pack(fill = X, ipady = 5)
+
   def accessApp(self):
-    self.management_socket.connect(self.management_address)
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], None)
+    user = User(self.user_id, self.user_kind)
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
+
+  def getCurrentUser(self):
+    return self.current_user
+
+  def setCurrentUser(self, user):
+    self.current_user = user
 
   def getVideos(self):
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
     
   def runVideo(self, video):
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
-
-  def showBegin(self):
-    self.clearBody()
-    self.createBtn(self.body, "Entrar", self.showLogin)
-    self.createBtn(self.body, "Sair", self.stop)
   
   def showLogin(self):
     self.clearBody()
     self.createTitle(self.body, "LOGIN")
     self.createTitle(self.body, "ID")
-    id = Entry(self.body).grid(row = 2,column = 0)
-    var1 = IntVar()
-    Checkbutton(self.body, text="Convidado", variable=var1).grid(row=2, sticky=W)
-    var2 = IntVar()
-    Checkbutton(self.body, text="Premium", variable=var2).grid(row=3, sticky=W)
-    self.createBtn(self.body, "Entrar", self.showOptions)
+    self.createInput(self.body, self.user_id)
+    self.createRadioOptions(self.body, self.user_kind, {"Convidado" : 0, "Premium" : 1})
+    self.createBtn(self.body, "Entrar", self.accessApp)
     self.createBtn(self.body, "Sair", self.stop)
   
   def showOptions(self):
