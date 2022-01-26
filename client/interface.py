@@ -4,9 +4,11 @@ from tkinter import *
 from functools import partial
 
 class Interface:
-  def __init__(self, socket, address):
-    self.socket = socket
-    self.address = address
+  def __init__(self, server_socket, server_address, management_socket, management_address):
+    self.server_socket = server_socket
+    self.server_address = server_address
+    self.management_socket = management_socket
+    self.management_address = management_address
 
     self.root = Tk() 
     self.root.title("Trabalho - Redes II")
@@ -47,14 +49,19 @@ class Interface:
     btn["command"] = action_with_arg
     btn.pack()
 
+  def accessApp(self):
+    self.management_socket.connect(self.management_address)
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], None)
+
   def getVideos(self):
-    general.formatSendTo(self.socket, general.CLIENT_COMMANDS[0], None, self.address)
+    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
     
   def runVideo(self, video):
-    general.formatSendTo(self.socket, general.CLIENT_COMMANDS[1], video, self.address)
+    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
 
   def showBegin(self):
     self.clearBody()
+    self.createBtn(self.body, "Entrar no App", self.accessApp)
     self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
     self.createBtn(self.body, "Sair", self.stop)
 
@@ -77,6 +84,6 @@ class Interface:
   
   def stop(self):
     print("Ate a proxima!")
-    self.socket.close()
+    self.server_socket.close()
     self.root.destroy()
     sys.exit()

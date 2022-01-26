@@ -9,3 +9,8 @@ def formatSendTo(socket, message, data, addr):
     data = [message, data]
     data_string = pickle.dumps(data)
     socket.sendto(data_string, addr)
+
+def formatTcpSendTo(socket, message, data):
+    data = [message, data]
+    data_string = pickle.dumps(data)
+    socket.send(data_string)

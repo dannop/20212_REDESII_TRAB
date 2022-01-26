@@ -22,7 +22,7 @@ pip install tk
 
 Em caso de problema com interface gráfica com Subsistema linux, instale o Xming no WIndows e rode no terminal:
 ```console
-export DISPLAY =:0
+export DISPLAY=:0
 ```
 
 ## INSTRUÇÕES DE USO:

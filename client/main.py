@@ -9,15 +9,15 @@ from video_player import VideoPlayer
 
 serverName = '192.168.1.155'
 
-streamingPort = 5050
+streamingPort = 6000
 streamingSocket = socket(AF_INET, SOCK_DGRAM)
 
-managementPort = 6060
+managementPort = 5000
 managementSocket = socket(AF_INET, SOCK_STREAM)
 
 threads = list()
 
-userInterface = Interface(streamingSocket, (serverName, streamingPort))
+userInterface = Interface(streamingSocket, (serverName, streamingPort), managementSocket, (serverName, managementPort))
 
 def createConnection():
     print('O cliente está online...') 
