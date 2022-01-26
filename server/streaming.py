@@ -6,10 +6,14 @@ import cv2
 import time
 import multiprocessing
 
-serverName = '192.168.1.103'
-serverPort = 6000
-serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind((serverName, serverPort))
+serverName = '192.168.1.155'
+
+streamingPort = 6000
+streamingSocket = socket(AF_INET, SOCK_DGRAM)
+streamingSocket.bind((serverName, streamingPort))
+
+managementPort = 5000
+managementSocket = socket(AF_INET, SOCK_STREAM)
 
 videos = []
 videos.append(Video('Batman', 14300, "videos/batman/"))
@@ -17,12 +21,12 @@ videos.append(Video('Matrix', 17200, "videos/matrix/"))
 
 all_processes = list()
 
-def stream(video, addr, serverSocket):
+def stream(video, addr, streamingSocket):
     cap = None
 
     if video[1] == '240p':
         cap = cv2.VideoCapture(video[0].getLowQuality())
-    elif video[1] == '240p':
+    elif video[1] == '480p':
         cap = cv2.VideoCapture(video[0].getMediumQuality())
     else:
         cap = cv2.VideoCapture(video[0].getHighQuality())
@@ -34,7 +38,7 @@ def stream(video, addr, serverSocket):
         while (cap.isOpened()):
             ret, frame = cap.read()
             if ret == True:
-                general.formatSendFrameTo(serverSocket, general.SERVER_COMMANDS[1], frame, addr)
+                general.formatSendFrameTo(streamingSocket, general.SERVER_COMMANDS[1], frame, addr)
                 time.sleep(0.1)
             else:
                 break
@@ -45,24 +49,24 @@ def createConnection():
     print('O servidor está online...')
     while True:
         try:   
-            data, addr = serverSocket.recvfrom(64*1024)
+            data, addr = streamingSocket.recvfrom(64*1024)
             data_variable = pickle.loads(data)
             print('Recebeu', data_variable[0])
 
             if (data_variable[0] == general.CLIENT_COMMANDS[0]): 
-                general.formatSendTo(serverSocket, general.SERVER_COMMANDS[0], videos, addr)
+                general.formatSendTo(streamingSocket, general.SERVER_COMMANDS[0], videos, addr)
             elif (data_variable[0] == general.CLIENT_COMMANDS[1]): 
-                process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, serverSocket))
+                process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, streamingSocket))
                 all_processes.append(process)
                 process.start()
             elif (data_variable[0] == general.CLIENT_COMMANDS[2]): 
                 process = all_processes[len(all_processes)-1]
                 process.terminate()
-                general.formatSendTo(serverSocket, general.SERVER_COMMANDS[0], videos, addr)   
+                general.formatSendTo(streamingSocket, general.SERVER_COMMANDS[0], videos, addr)   
 
         except Exception as e: 
             print("Houve um problema no servidor!", e) 
-            serverSocket.close()
+            streamingSocket.close()
             break
 
 if __name__ == "__main__":
