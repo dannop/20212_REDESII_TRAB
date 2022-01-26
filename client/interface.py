@@ -55,13 +55,25 @@ class Interface:
 
   def showBegin(self):
     self.clearBody()
+    self.createBtn(self.body, "Entrar", self.showLogin)
+    self.createBtn(self.body, "Sair", self.stop)
+  
+  def showLogin(self):
+    self.clearBody()
+    self.createBtn(self.body, "Login", self.showOptions)
+    self.createBtn(self.body, "Sair", self.stop)
+  
+  def showOptions(self):
+    self.clearBody()
     self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
+    self.createBtn(self.body, "Status do Usuário", self.showStatus)
+    self.createBtn(self.body, "Grupo", self.showGroupOptions)
     self.createBtn(self.body, "Sair", self.stop)
 
   def showVideos(self, videos): 
     self.videos = videos
     self.clearBody()
-    self.createBtn(self.body, "Voltar", self.showBegin)
+    self.createBtn(self.body, "Voltar", self.showOptions)
     for video in videos: 
       self.createBtn(self.body, video.name, self.showSelectQuality, video)
 
@@ -71,6 +83,18 @@ class Interface:
     self.createBtn(self.body, '240p', self.runVideo, [video, '240p'])
     self.createBtn(self.body, '480p', self.runVideo, [video, '480p'])
     self.createBtn(self.body, '720p', self.runVideo, [video, '720p'])  
+  
+  def showStatus(self):
+    self.clearBody()
+    self.createBtn(self.body, "Voltar", self.showOptions)
+
+  def showGroupOptions(self):
+    self.clearBody()
+    self.createBtn(self.body, "Criar Grupo", self.showOptions)
+    self.createBtn(self.body, "Ver Grupo", self.showOptions)
+    self.createBtn(self.body, "Adicionar Usuário", self.showOptions)
+    self.createBtn(self.body, "Remover Usuário", self.showOptions)
+    self.createBtn(self.body, "Voltar", self.showOptions)
 
   def run(self):
     self.root.mainloop()
