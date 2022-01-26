@@ -14,10 +14,10 @@ def formatSendTo(socket, message, data, addr):
     data_compressed = zlib.compress(data_string)
     socket.sendto(data_compressed, addr)
 
-def formatTcpSendTo(socket, message, data):
+def formatTcpSendTo(conn, message, data):
     data = [message, data]
     data_string = pickle.dumps(data)
-    socket.send(data_string)
+    conn.send(data_string)
     
 def formatSendFrameTo(socket, message, frame, addr):
     encoded, buffer = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 10])

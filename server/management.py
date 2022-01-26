@@ -36,27 +36,27 @@ def createConnection():
       print('Recebeu', data_variable[0])  
 
       if (data_variable[0] == general.SERVER_COMMANDS[2]): 
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[0], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], None)
       elif (data_variable[0] == general.CLIENT_COMMANDS[3]):
         if data_variable[1] in users:
-          general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[2], None)
+          general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[2], None)
         else: 
-          general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[1], None)
+          general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[1], None)
       elif (data_variable[0] == general.CLIENT_COMMANDS[4]):
         users.remove(data_variable[0])
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[3], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[3], None)
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[0]):
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[4], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[4], None)
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[1]):
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[5], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], None)
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[2]):
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[6], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], None)
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[3]):
-        general.formatTcpSendTo(managementSocket, general.MANAGEMENT_COMMANDS[7], None)
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[7], None)
     
     except Exception as e: 
       print("Houve um problema no servidor!", e) 
-      managementSocket.close()
+      conn.close()
       break
 
 if __name__ == "__main__":

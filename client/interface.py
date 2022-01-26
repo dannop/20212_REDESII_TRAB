@@ -22,6 +22,7 @@ class Interface:
 
     self.videos = []
 
+    self.last_connection = 'TCP'
     self.current_user = None
     self.user_id = None
     self.user_kind = None
@@ -64,9 +65,15 @@ class Interface:
                 value = value, indicator = 0).pack(fill = X, ipady = 5)
 
   def accessApp(self):
+    self.last_connection = 'TCP'
     user = User(self.user_id, self.user_kind)
+    self.current_user = user
     general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
-
+  
+  def logout(self):
+    self.last_connection = 'TCP'
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
+  
   def getCurrentUser(self):
     return self.current_user
 
@@ -74,9 +81,11 @@ class Interface:
     self.current_user = user
 
   def getVideos(self):
+    self.last_connection = 'UDP'
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
     
   def runVideo(self, video):
+    self.last_connection = 'UDP'
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
   
   def showLogin(self):
@@ -93,7 +102,7 @@ class Interface:
     self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
     self.createBtn(self.body, "Status do Usuário", self.showStatus)
     self.createBtn(self.body, "Grupo", self.showGroupOptions)
-    self.createBtn(self.body, "Sair", self.stop)
+    self.createBtn(self.body, "Sair", self.logout)
 
   def showVideos(self, videos): 
     self.videos = videos
@@ -155,5 +164,6 @@ class Interface:
   def stop(self):
     print("Ate a proxima!")
     self.server_socket.close()
+    self.management_socket.close()
     self.root.destroy()
     sys.exit()
