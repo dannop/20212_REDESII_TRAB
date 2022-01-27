@@ -30,8 +30,10 @@ def createUdpConnection():
                 print('Recebeu', data_variable[0])
 
                 if (data_variable[0] == general.SERVER_COMMANDS[0]):
+                    # LISTA_DE_VIDEOS
                     userInterface.showVideos(data_variable[1])
                 elif (data_variable[0] == general.SERVER_COMMANDS[1]):
+                    # REPRODUZINDO_O_VIDEO
                     VideoPlayer.runStream(streamingSocket, data_variable[1], addr)   
                 
         except Exception as e: 
