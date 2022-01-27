@@ -3,8 +3,6 @@ import general
 from socket import *
 import threading
 
-from users import User
-
 serverName = '192.168.1.155'
 
 managementPort = 5000
@@ -13,12 +11,36 @@ managementSocket.bind((serverName, managementPort))
 
 users = []
 
+def remove_user(user):
+  for u in users:
+   if u.id == user.id:
+      users.remove(u)
+
 def handle_client(conn, addr):
   while True:
-    msg_length = conn.recv(64).decode("utf-8") # I got the error when I put server.recv
-    if msg_length:
-      msg = conn.recv(int(msg_length)).decode('utf-8') # Here too
-      print(msg)
+    data = conn.recv(64*1024)
+    data_variable = pickle.loads(data) 
+    print('Recebeu', data_variable[0])
+
+    if (data_variable[0] == general.SERVER_COMMANDS[2]): 
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], None)
+    elif (data_variable[0] == general.CLIENT_COMMANDS[3]):
+      if data_variable[1] in users:
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[2], None)
+      else: 
+        users.append(data_variable[1])
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[1], data_variable[1])
+    elif (data_variable[0] == general.CLIENT_COMMANDS[4]):
+      remove_user(data_variable[1])
+      general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[3], None)
+    elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[0]):
+      general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[4], None)
+    elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[1]):
+      general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], None)
+    elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[2]):
+      general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], None)
+    elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[3]):
+      general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[7], None)
 
 def createConnection():
   managementSocket.listen()
@@ -28,31 +50,8 @@ def createConnection():
     conn, addr = managementSocket.accept() 
     
     try:
-      # thread = threading.Thread(target=handle_client, args=(conn, addr))
-      # thread.start()
-
-      data = conn.recv(64*1024)
-      data_variable = pickle.loads(data)
-      print('Recebeu', data_variable[0])  
-
-      if (data_variable[0] == general.SERVER_COMMANDS[2]): 
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], None)
-      elif (data_variable[0] == general.CLIENT_COMMANDS[3]):
-        if data_variable[1] in users:
-          general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[2], None)
-        else: 
-          general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[1], None)
-      elif (data_variable[0] == general.CLIENT_COMMANDS[4]):
-        users.remove(data_variable[0])
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[3], None)
-      elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[0]):
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[4], None)
-      elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[1]):
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], None)
-      elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[2]):
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], None)
-      elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[3]):
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[7], None)
+      thread = threading.Thread(target=handle_client, args=(conn, addr))
+      thread.start()
     
     except Exception as e: 
       print("Houve um problema no servidor!", e) 

@@ -45,8 +45,7 @@ def handleManagement():
     elif (data_variable[0] == general.MANAGEMENT_COMMANDS[3]):
         # fecha a conexão TCP com o servidor gerenciador de serviço e; 
         # caso esteja em um streaming envia notificação “PARAR_STREAMING” para o servidor de streaming.
-        userInterface.setCurrentUser(None)
-        userInterface.showLogin()
+        userInterface.stop()
     elif (data_variable[0] == general.MANAGEMENT_COMMANDS[4]):
         # mostra na tela a correspondente notificação para o usuário para CRIAR_GRUPO_ACK
         userInterface.showVideos(data_variable[1])

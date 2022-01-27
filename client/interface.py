@@ -24,8 +24,9 @@ class Interface:
 
     self.last_connection = 'TCP'
     self.current_user = None
-    self.user_id = None
-    self.user_kind = None
+    
+    self.user_id = StringVar()
+    self.user_kind = IntVar()
 
   def clearBody(self):
     for widgets in self.body.winfo_children():
@@ -55,31 +56,41 @@ class Interface:
     btn["command"] = action_with_arg
     btn.pack()
 
-  def createInput(self, container, value): 
-    input = Entry(container, textvariable = value)
-    input.pack()
+  def createInput(self, container, label_text, value, pos_x, pos_y): 
+    label = Label(container, text=label_text, width=20)
+    label["font"] = ("Arial", "40", "bold")
+    label.pack()
+    # label.place(x=pos_x, y=pos_y)
+    
+    entry = Entry(container, textvariable=value)
+    entry.pack()
+    # entry.place(x=pos_x+120, y=pos_y)
   
   def createRadioOptions(self, container, variable, values): 
     for (text, value) in values.items():
       Radiobutton(container, text = text, variable = variable,
-                value = value, indicator = 0).pack(fill = X, ipady = 5)
+                value = value).pack(fill = X, ipady = 5)
 
-  def accessApp(self):
-    self.last_connection = 'TCP'
-    user = User(self.user_id, self.user_kind)
-    self.current_user = user
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
-  
-  def logout(self):
-    self.last_connection = 'TCP'
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
-  
   def getCurrentUser(self):
     return self.current_user
 
   def setCurrentUser(self, user):
     self.current_user = user
 
+  def accessApp(self):
+    user_id = self.user_id.get()
+    user_kind = self.user_kind.get()
+    
+    if user_id != None and user_kind != None:
+      self.last_connection = 'TCP'
+      user = User(user_id, user_kind)
+      self.current_user = user
+      general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
+  
+  def logout(self):
+    self.last_connection = 'TCP'
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
+  
   def getVideos(self):
     self.last_connection = 'UDP'
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
@@ -90,9 +101,8 @@ class Interface:
   
   def showLogin(self):
     self.clearBody()
-    self.createTitle(self.body, "LOGIN")
-    self.createTitle(self.body, "ID")
-    self.createInput(self.body, self.user_id)
+    self.createTitle(self.body, "Trabalho de Redes II")
+    self.createInput(self.body, "ID", self.user_id, 60, 80)
     self.createRadioOptions(self.body, self.user_kind, {"Convidado" : 0, "Premium" : 1})
     self.createBtn(self.body, "Entrar", self.accessApp)
     self.createBtn(self.body, "Sair", self.stop)
