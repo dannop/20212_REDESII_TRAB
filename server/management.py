@@ -10,13 +10,14 @@ managementSocket = socket(AF_INET, SOCK_STREAM)
 managementSocket.bind((serverName, managementPort))
 
 threads = list()
-
-users = []
+groups = list()
+users = list()
 
 def removeUser(user):
-  for u in users:
-   if u.id == user.id:
-      users.remove(u)
+  if user:
+    for u in users:
+      if u.id == user.id:
+          users.remove(u)
 
 def handleClient(conn, addr):
   while True:
