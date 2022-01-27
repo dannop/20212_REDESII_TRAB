@@ -167,10 +167,11 @@ class Interface:
 
   def showGroupOptions(self):
     self.clearBody()
-    self.createBtn(self.body, "Criar Grupo", self.showNewGroup)
-    self.createBtn(self.body, "Ver Grupo", self.getGroup)
-    self.createBtn(self.body, "Adicionar Usuário", self.showAddUser)
-    self.createBtn(self.body, "Remover Usuário", self.showRemoveUser)
+    if self.current_user and self.current_user.kind == 1:
+      self.createBtn(self.body, "Criar Grupo", self.showNewGroup)
+      self.createBtn(self.body, "Ver Grupo", self.getGroup)
+      self.createBtn(self.body, "Adicionar Usuário", self.showAddUser)
+      self.createBtn(self.body, "Remover Usuário", self.showRemoveUser)
     self.createBtn(self.body, "Voltar", self.showOptions)
   
   def showUser(self, user, message=''):
@@ -209,6 +210,7 @@ class Interface:
       for user in group.users:
         self.createParagraph(self.body, user.id)
     
+    self.createBtn(self.body, "Exibir", self.showGroupOptions)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
   def showAddUser(self):

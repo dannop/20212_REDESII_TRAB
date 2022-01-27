@@ -1,5 +1,4 @@
 import pickle
-from tokenize import group
 import general 
 from socket import *
 import threading
@@ -77,8 +76,9 @@ def handleCommands(conn, addr):
         if new_user:
           if current_group:
             current_group.users.append(new_user)
-                
-          general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Usuário adicionado com sucesso!'])
+            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Usuário adicionado com sucesso!'])
+          else:
+            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Grupo não encontrado.'])  
         else:
           general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Usuário não encontrado.'])
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[2]):
@@ -94,11 +94,12 @@ def handleCommands(conn, addr):
               if u.id == remove_user.id:
                 finded = True
                 current_group.users.remove(u)
-
-          if finded:
-            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário removido com sucesso!'])
+            if finded:
+              general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário removido com sucesso!'])
+            else:
+              general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário não encontrado.'])
           else:
-            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário não encontrado.'])
+            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Grupo não encontrado.'])
         else:
           general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário não encontrado.'])
       elif (data_variable[0] == general.CLIENT_PREMIUM_COMMANDS[3]):
