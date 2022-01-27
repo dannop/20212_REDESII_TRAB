@@ -2,6 +2,7 @@ import sys
 import pickle
 import general 
 from socket import *
+from interface import Interface
 from video import Video
 import cv2
 import time
@@ -25,6 +26,8 @@ videos.append(Video('Matrix', 17200, "videos/matrix/"))
 
 threads = list()
 all_processes = list()
+
+adminInterface = Interface()
 
 def stream(video, addr, streamingSocket):
     cap = None
@@ -117,6 +120,9 @@ if __name__ == "__main__":
     createThread(threads, createManagementConnection)
 
     print('O servidor está online...')
+
+    adminInterface.showVideos()
+    adminInterface.run()
 
     for thread in threads:
         thread.join()
