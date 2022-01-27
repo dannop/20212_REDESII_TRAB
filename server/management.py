@@ -49,9 +49,7 @@ def handleCommands(conn, addr):
       # Server Commands
       if (data_variable[0] == general.SERVER_COMMANDS[2]): 
         # GET_USER_INFORMATION
-        user = data_variable[1][0]
-        video = data_variable[1][1]
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], [user, video])
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], data_variable[1])
 
       # Client Commands
       if (data_variable[0] == general.CLIENT_COMMANDS[3]):
