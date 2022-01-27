@@ -3,8 +3,8 @@ import general
 from tkinter import * 
 from functools import partial
 
-from groups import Group
-from users import User
+from group import Group
+from user import User
 
 class Interface:
   def __init__(self, server_socket, server_address, management_socket, management_address):
@@ -125,7 +125,6 @@ class Interface:
   
   def showLogin(self):
     self.clearBody()
-    self.createTitle(self.body, "Trabalho de Redes II")
     self.createInput(self.body, "ID", self.user_id)
     self.createRadioOptions(self.body, self.user_kind, {"Convidado" : 0, "Premium" : 1})
     self.createBtn(self.body, "Entrar", self.accessApp)
