@@ -1,4 +1,3 @@
-import sys
 import general
 import pickle
 import threading
@@ -21,59 +20,58 @@ threads = list()
 
 userInterface = Interface(streamingSocket, streamingAddress, managementSocket, managementAddress)
 
-def handleStreaming():
-    data, addr = streamingSocket.recvfrom(64*1024)
-    data_decompressed = zlib.decompress(data)
-    data_variable = pickle.loads(data_decompressed)
-    print('Recebeu', data_variable[0])
-
-    if (data_variable[0] == general.SERVER_COMMANDS[0]):
-        userInterface.showVideos(data_variable[1])
-    elif (data_variable[0] == general.SERVER_COMMANDS[1]):
-        VideoPlayer.runStream(streamingSocket, data_variable[1], addr)
-
-def handleManagement():
-    data = managementSocket.recv(64*1024)
-    data_variable = pickle.loads(data)
-    print('Recebeu', data_variable[0])
-
-    if (data_variable[0] == general.MANAGEMENT_COMMANDS[1]):
-        userInterface.showOptions()
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[2]):
-        # mostra na tela a informacao do usuario recebida na mensagem
-        userInterface.showVideos(data_variable[1])
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[3]):
-        # fecha a conexão TCP com o servidor gerenciador de serviço e; 
-        # caso esteja em um streaming envia notificação “PARAR_STREAMING” para o servidor de streaming.
-        userInterface.stop()
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[4]):
-        # mostra na tela a correspondente notificação para o usuário para CRIAR_GRUPO_ACK
-        userInterface.showVideos(data_variable[1])
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[5]):
-        # mostra na tela a correspondente notificação para o usuário para ADD_USUARIO_GRUPO_ACK
-        userInterface.showVideos(data_variable[1])
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[6]):
-        # mostra na tela a correspondente notificação para o usuário para REMOVER_USUARIO_GRUPO_ACK
-        userInterface.showVideos(data_variable[1])
-    elif (data_variable[0] == general.MANAGEMENT_COMMANDS[6]):
-        # mostra na tela a correspondente notificação para o usuário para GRUPO_DE_STREAMING
-        userInterface.showVideos(data_variable[1])
-
-def createConnection():
-    managementSocket.connect(managementAddress)
-    
-    print('O cliente está online...') 
+def createUdpConnection():
     while True:
         try: 
-            print('Tipo', userInterface.last_connection)
-            if userInterface.last_connection == 'TCP':
-                handleManagement()
-            else:    
-                handleStreaming()
-            
+            data, addr = streamingSocket.recvfrom(64*1024)
+            data_decompressed = zlib.decompress(data)
+            data_variable = pickle.loads(data_decompressed)
+            print('Recebeu', data_variable[0])
+
+            if (data_variable[0] == general.SERVER_COMMANDS[0]):
+                userInterface.showVideos(data_variable[1])
+            elif (data_variable[0] == general.SERVER_COMMANDS[1]):
+                VideoPlayer.runStream(streamingSocket, data_variable[1], addr)   
+                
         except Exception as e: 
             print("Houve um problema!", e) 
             streamingSocket.close()
+            userInterface.stop()
+
+def createTcpConnection():
+    managementSocket.connect(managementAddress)
+
+    while True:
+        try: 
+            data = managementSocket.recv(64*1024)
+            data_variable = pickle.loads(data)
+            print('Recebeu', data_variable[0])
+
+            if (data_variable[0] == general.MANAGEMENT_COMMANDS[1]):
+                userInterface.showOptions()
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[2]):
+                # mostra na tela a informacao do usuario recebida na mensagem
+                userInterface.showVideos(data_variable[1])
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[3]):
+                # fecha a conexão TCP com o servidor gerenciador de serviço e; 
+                # caso esteja em um streaming envia notificação “PARAR_STREAMING” para o servidor de streaming.
+                userInterface.stop()
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[4]):
+                # mostra na tela a correspondente notificação para o usuário para CRIAR_GRUPO_ACK
+                userInterface.showVideos(data_variable[1])
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[5]):
+                # mostra na tela a correspondente notificação para o usuário para ADD_USUARIO_GRUPO_ACK
+                userInterface.showVideos(data_variable[1])
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[6]):
+                # mostra na tela a correspondente notificação para o usuário para REMOVER_USUARIO_GRUPO_ACK
+                userInterface.showVideos(data_variable[1])
+            elif (data_variable[0] == general.MANAGEMENT_COMMANDS[6]):
+                # mostra na tela a correspondente notificação para o usuário para GRUPO_DE_STREAMING
+                userInterface.showVideos(data_variable[1])
+            
+        except Exception as e: 
+            print("Houve um problema!", e) 
+            managementSocket.close()
             userInterface.stop()
 
 def createThread(threads, target):
@@ -83,12 +81,13 @@ def createThread(threads, target):
 
 if __name__ == "__main__":
     
-    createThread(threads, createConnection)
+    createThread(threads, createUdpConnection)
+    createThread(threads, createTcpConnection)
 
+    print('O cliente está online...') 
+    
     userInterface.showLogin()
     userInterface.run()
 
     for thread in threads:
         thread.join()
-    
-    sys.exit()

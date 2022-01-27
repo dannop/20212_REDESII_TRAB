@@ -22,11 +22,12 @@ class Interface:
 
     self.videos = []
 
-    self.last_connection = 'TCP'
     self.current_user = None
     
     self.user_id = StringVar()
     self.user_kind = IntVar()
+
+    self.group_id = StringVar()
 
   def clearBody(self):
     for widgets in self.body.winfo_children():
@@ -57,19 +58,17 @@ class Interface:
     btn = Button(container)
     btn["text"] = text
     btn["font"] = ("Calibri", "40")
-    btn["width"] = 12
+    btn["width"] = 20
     btn["command"] = action_with_arg
     btn.pack()
 
-  def createInput(self, container, label_text, value, pos_x, pos_y): 
+  def createInput(self, container, label_text, value): 
     label = Label(container, text=label_text, width=20)
     label["font"] = ("Arial", "40", "bold")
     label.pack()
-    # label.place(x=pos_x, y=pos_y)
     
     entry = Entry(container, textvariable=value)
     entry.pack()
-    # entry.place(x=pos_x+120, y=pos_y)
   
   def createRadioOptions(self, container, variable, values): 
     for (text, value) in values.items():
@@ -87,27 +86,35 @@ class Interface:
     user_kind = self.user_kind.get()
     
     if user_id != '':
-      self.last_connection = 'TCP'
       user = User(user_id, user_kind)
       self.current_user = user
       general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
   
   def logout(self):
-    self.last_connection = 'TCP'
     general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
   
+  def newGroup(self):
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[0], self.current_user)
+
+  def showGroup(self):
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[3], self.current_user)
+
+  def addUser(self):
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[1], self.current_user)
+
+  def removeUser(self):
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[2], self.current_user)
+
   def getVideos(self):
-    self.last_connection = 'UDP'
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
     
   def runVideo(self, video):
-    self.last_connection = 'UDP'
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
   
   def showLogin(self):
     self.clearBody()
     self.createTitle(self.body, "Trabalho de Redes II")
-    self.createInput(self.body, "ID", self.user_id, 60, 80)
+    self.createInput(self.body, "ID", self.user_id)
     self.createRadioOptions(self.body, self.user_kind, {"Convidado" : 0, "Premium" : 1})
     self.createBtn(self.body, "Entrar", self.accessApp)
     self.createBtn(self.body, "Sair", self.stop)
@@ -123,6 +130,7 @@ class Interface:
     self.videos = videos
     self.clearBody()
     self.createBtn(self.body, "Voltar", self.showOptions)
+    
     for video in videos: 
       self.createBtn(self.body, video.name, self.showSelectQuality, video)
 
@@ -136,13 +144,17 @@ class Interface:
   def showStatus(self):
     self.clearBody()
     self.createTitle(self.body, "ID: "+self.current_user.id)
+    
     if self.current_user.kind == 0:
       self.createTitle(self.body, "Tipo: Convidado")
     else:
       self.createTitle(self.body, "Tipo: Premium")
-    self.createTitle(self.body, "Grupo: ")
+    
+    self.createTitle(self.body, "Grupo:")
+    
     for id in self.current_user.group.user_ids:
       self.createParagraph(self.body, id)
+    
     self.createBtn(self.body, "Voltar", self.showOptions)
 
   def showGroupOptions(self):
@@ -161,22 +173,26 @@ class Interface:
     newGroup.pack()
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
-  def showGroup(self):
+  def showGroup(self, group):
     self.clearBody()
-    self.createTitle(self.body, "NOME DO GRUPO:")
-    self.createTitle(self.body, "MEMBROS DO GRUPO:")
+    self.createTitle(self.body, "ID do Grupo: "+group.id)
+    self.createTitle(self.body, "Membros:")
+    for id in group.user_ids:
+      self.createParagraph(self.body, id)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
   def showAddUser(self):
     self.clearBody()
-    self.createTitle(self.body, "ID DO USUÁRIO PARA ADICIONAR:")
-    addUser = Entry(self.body)
+    self.createTitle(self.body, "Adicionar Usuário:")
+    self.createInput(self.body, "ID", self.user_id)
+    self.createBtn(self.body, "Confirmar", self.addUser)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showRemoveUser(self):
     self.clearBody()
-    self.createTitle(self.body, "ID DO USUÁRIO PARA REMOVER:")
-    removeUser = Entry(self.body)
+    self.createTitle(self.body, "Remover Usuário:")
+    self.createInput(self.body, "ID", self.user_id)
+    self.createBtn(self.body, "Confirmar", self.removeUser)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def run(self):
