@@ -1,4 +1,5 @@
 class Group:
-  def __init__(self, id):
+  def __init__(self, id, user):
     self.id = id
-    self.user_ids = []
+    self.owner = user
+    self.users = []

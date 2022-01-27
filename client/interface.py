@@ -2,6 +2,8 @@ import sys
 import general
 from tkinter import * 
 from functools import partial
+
+from groups import Group
 from users import User
 
 class Interface:
@@ -81,22 +83,36 @@ class Interface:
     
     if user_id != '':
       user = User(user_id, user_kind)
+      self.user_id = StringVar()
+      self.user_kind = IntVar()
       general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
   
   def logout(self):
     general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
   
   def newGroup(self):
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[0], self.current_user)
+    group_id = self.group_id.get()
+    if group_id != '':
+      group = Group(group_id, self.current_user)
+      self.group_id = StringVar()
+      self.current_user.group = group
+      
+      general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[0], group)
 
-  def showGroup(self):
+  def getGroup(self):
     general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[3], self.current_user)
 
   def addUser(self):
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[1], self.current_user)
+    user_id = self.user_id.get()
+    if user_id != '':
+      self.user_id = StringVar()
+      general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[1], [self.current_user, user_id])
 
   def removeUser(self):
-    general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[2], self.current_user)
+    user_id = self.user_id.get()
+    if user_id != '':
+      self.user_id = StringVar()
+      general.formatTcpSendTo(self.management_socket, general.CLIENT_PREMIUM_COMMANDS[2], [self.current_user, user_id])
 
   def getVideos(self):
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
@@ -144,19 +160,33 @@ class Interface:
     
     self.createTitle(self.body, "Grupo:")
     
-    for id in user.group.user_ids:
-      self.createParagraph(self.body, id)
+    for user in user.group.users:
+      self.createParagraph(self.body, user.id)
     
     self.createBtn(self.body, "Voltar", self.showOptions)
 
   def showGroupOptions(self):
     self.clearBody()
     self.createBtn(self.body, "Criar Grupo", self.showNewGroup)
-    self.createBtn(self.body, "Ver Grupo", self.showGroup)
+    self.createBtn(self.body, "Ver Grupo", self.getGroup)
     self.createBtn(self.body, "Adicionar Usuário", self.showAddUser)
     self.createBtn(self.body, "Remover Usuário", self.showRemoveUser)
     self.createBtn(self.body, "Voltar", self.showOptions)
   
+  def showUser(self, user, message=''):
+    self.clearBody()
+    
+    if message != '':
+      self.createParagraph(self.body, message)
+    
+    self.createTitle(self.body, "Usuário")
+    
+    if user: 
+      self.createTitle(self.body, "ID: "+user.id)
+      self.createTitle(self.body, "Grupo: "+user.group.id)
+    
+    self.createBtn(self.body, "Entrar", self.showOptions)
+
   def showNewGroup(self):
     self.clearBody()
     self.createTitle(self.body, "Novo Grupo")
@@ -164,13 +194,20 @@ class Interface:
     self.createBtn(self.body, "Confirmar", self.newGroup)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
-  def showGroup(self, group):
+  def showGroup(self, group, message=''):
     self.clearBody()
-    self.createTitle(self.body, "ID do Grupo: "+group.id)
-    self.createTitle(self.body, "Membros:")
-    
-    for id in group.user_ids:
-      self.createParagraph(self.body, id)
+
+    if message != '':
+      self.createParagraph(self.body, message)
+
+    self.createTitle(self.body, "Grupo")
+
+    if group:
+      self.createTitle(self.body, "ID: "+group.id)
+      self.createTitle(self.body, "Membros:")
+      
+      for user in group.users:
+        self.createParagraph(self.body, user.id)
     
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
