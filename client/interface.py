@@ -75,19 +75,12 @@ class Interface:
       Radiobutton(container, text = text, variable = variable,
                 value = value).pack(fill = X, ipady = 5)
 
-  def getCurrentUser(self):
-    return self.current_user
-
-  def setCurrentUser(self, user):
-    self.current_user = user
-
   def accessApp(self):
     user_id = self.user_id.get()
     user_kind = self.user_kind.get()
     
     if user_id != '':
       user = User(user_id, user_kind)
-      self.current_user = user
       general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[3], user)
   
   def logout(self):
@@ -122,7 +115,6 @@ class Interface:
   def showOptions(self):
     self.clearBody()
     self.createBtn(self.body, "Exibir Vídeos", self.getVideos)
-    self.createBtn(self.body, "Status do Usuário", self.showStatus)
     self.createBtn(self.body, "Grupo", self.showGroupOptions)
     self.createBtn(self.body, "Sair", self.logout)
 
@@ -141,18 +133,18 @@ class Interface:
     self.createBtn(self.body, '480p', self.runVideo, [video, '480p'])
     self.createBtn(self.body, '720p', self.runVideo, [video, '720p'])  
   
-  def showStatus(self):
+  def showStatus(self, user):
     self.clearBody()
-    self.createTitle(self.body, "ID: "+self.current_user.id)
+    self.createTitle(self.body, "ID: "+user.id)
     
-    if self.current_user.kind == 0:
+    if user.kind == 0:
       self.createTitle(self.body, "Tipo: Convidado")
     else:
       self.createTitle(self.body, "Tipo: Premium")
     
     self.createTitle(self.body, "Grupo:")
     
-    for id in self.current_user.group.user_ids:
+    for id in user.group.user_ids:
       self.createParagraph(self.body, id)
     
     self.createBtn(self.body, "Voltar", self.showOptions)
@@ -167,18 +159,19 @@ class Interface:
   
   def showNewGroup(self):
     self.clearBody()
-    self.createTitle(self.body, "NOVO GRUPO")
-    self.createTitle(self.body, "NOME DO GRUPO")
-    newGroup = Entry(self.body)
-    newGroup.pack()
+    self.createTitle(self.body, "Novo Grupo")
+    self.createInput(self.body, "ID", self.group_id)
+    self.createBtn(self.body, "Confirmar", self.newGroup)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showGroup(self, group):
     self.clearBody()
     self.createTitle(self.body, "ID do Grupo: "+group.id)
     self.createTitle(self.body, "Membros:")
+    
     for id in group.user_ids:
       self.createParagraph(self.body, id)
+    
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
   def showAddUser(self):
