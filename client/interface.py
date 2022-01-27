@@ -209,8 +209,9 @@ class Interface:
       
       for user in group.users:
         self.createParagraph(self.body, user.id)
+
+      self.createBtn(self.body, "Reprouzir", self.showGroupOptions)
     
-    self.createBtn(self.body, "Exibir", self.showGroupOptions)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
   def showAddUser(self):

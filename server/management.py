@@ -75,8 +75,8 @@ def handleCommands(conn, addr):
         
         if new_user:
           if current_group:
-            current_group.users.append(new_user)
-            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Usuário adicionado com sucesso!'])
+            message = current_group.addUser(new_user)
+            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, message])
           else:
             general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[5], [current_group, 'Grupo não encontrado.'])  
         else:
@@ -88,16 +88,9 @@ def handleCommands(conn, addr):
         current_group = findGroup(user)
         
         if remove_user:
-          finded = False
           if current_group:
-            for u in current_group.users:
-              if u.id == remove_user.id:
-                finded = True
-                current_group.users.remove(u)
-            if finded:
-              general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário removido com sucesso!'])
-            else:
-              general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Usuário não encontrado.'])
+            message = current_group.removeUser(remove_user)
+            general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, message])
           else:
             general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[6], [current_group, 'Grupo não encontrado.'])
         else:
