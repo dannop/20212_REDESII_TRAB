@@ -61,13 +61,21 @@ def createConnection():
                 if (data_variable[0] == general.CLIENT_COMMANDS[0]): 
                     general.formatSendTo(streamingSocket, general.SERVER_COMMANDS[0], videos, addr)
                 elif (data_variable[0] == general.CLIENT_COMMANDS[1]): 
-                    process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, streamingSocket))
-                    all_processes.append(process)
-                    process.start()
+                    user = data_variable[1][0]
+                    video = data_variable[1][1]
+                    general.formatTcpSendTo(managementSocket, general.SERVER_COMMANDS[2], [user, video])
+                    # process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, streamingSocket))
+                    # all_processes.append(process)
+                    # process.start()
                 elif (data_variable[0] == general.CLIENT_COMMANDS[2]): 
                     process = all_processes[len(all_processes)-1]
                     process.terminate()
                     general.formatSendTo(streamingSocket, general.SERVER_COMMANDS[0], videos, addr)   
+                elif (data_variable[0] == general.MANAGEMENT_COMMANDS[8]): 
+                    print('Reproduzir para o Grupo') 
+                    # process = multiprocessing.Process(target=stream, args=(data_variable[1], addr, streamingSocket))
+                    # all_processes.append(process)
+                    # process.start()
 
         except Exception as e: 
             print("Houve um problema no servidor!", e) 
@@ -80,9 +88,24 @@ def createManagementConnection():
     while True:
         try: 
             data = managementSocket.recv(64*1024)
-            data_variable = pickle.loads(data)
-            print('Recebeu', data_variable[0])
+            if data:
+                data_variable = pickle.loads(data)
+                print('Recebeu', data_variable[0])
             
+                if (data_variable[0] == general.MANAGEMENT_COMMANDS[0]): 
+                    user = data_variable[1][0]
+                    
+                    if user.kind == 0:
+                        print('Resposta: NÃO TEM PERMISSÃO PARA REPRODUZIR VÍDEOS, POR FAVOR MUDA SUA CLASSIFICAÇÃO')
+                        # general.formatSendTo(streamingSocket, 'Resposta: NÃO TEM PERMISSÃO PARA REPRODUZIR VÍDEOS, POR FAVOR MUDA SUA CLASSIFICAÇÃO', None, streamingAddress)  
+                    else:
+                        video = data_variable[1][1]
+                        # print('Resposta: REPRODUZINDO O VÍDEO '+video[0].video.name+','+'COM RESOLUÇÃO '+video[1])
+                        # general.formatSendTo(streamingSocket, 'Resposta: REPRODUZINDO O VÍDEO '+video[0].video.name+','+'COM RESOLUÇÃO '+video[1], None, streamingAddress)  
+                        process = multiprocessing.Process(target=stream, args=(video, streamingAddress, streamingSocket))
+                        all_processes.append(process)
+                        process.start()
+
         except Exception as e: 
             print("Houve um problema no gerenciador!", e) 
             managementSocket.close()

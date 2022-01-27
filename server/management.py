@@ -5,6 +5,10 @@ import threading
 
 serverName = '192.168.1.155'
 
+streamingPort = 6000
+streamingSocket = socket(AF_INET, SOCK_DGRAM)
+streamingAddress = (serverName, streamingPort)
+
 managementPort = 5000
 managementSocket = socket(AF_INET, SOCK_STREAM)
 managementSocket.bind((serverName, managementPort))
@@ -45,8 +49,10 @@ def handleCommands(conn, addr):
       # Server Commands
       if (data_variable[0] == general.SERVER_COMMANDS[2]): 
         # GET_USER_INFORMATION
-        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], None)
-      
+        user = data_variable[1][0]
+        video = data_variable[1][1]
+        general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[0], [user, video])
+
       # Client Commands
       if (data_variable[0] == general.CLIENT_COMMANDS[3]):
         # ENTRAR_NA_APP
@@ -57,6 +63,9 @@ def handleCommands(conn, addr):
         else: 
           users.append(data_variable[1])
           general.formatTcpSendTo(conn, general.MANAGEMENT_COMMANDS[1], data_variable[1])
+      elif (data_variable[0] == general.CLIENT_COMMANDS[5]):
+        # REPRODUZIR_VIDEO_GRUPO
+        general.formatSendTo(streamingSocket, general.MANAGEMENT_COMMANDS[8], None, streamingAddress)
       elif (data_variable[0] == general.CLIENT_COMMANDS[4]):
         # SAIR_DA_APP
         removeUser(data_variable[1])

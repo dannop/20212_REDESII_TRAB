@@ -90,6 +90,9 @@ class Interface:
   def logout(self):
     general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[4], self.current_user)
   
+  def playToGroup(self):
+    general.formatTcpSendTo(self.management_socket, general.CLIENT_COMMANDS[5], self.current_user.group)
+
   def newGroup(self):
     group_id = self.group_id.get()
     if group_id != '':
@@ -118,7 +121,7 @@ class Interface:
     general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[0], None, self.server_address)
     
   def runVideo(self, video):
-    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], video, self.server_address)
+    general.formatSendTo(self.server_socket, general.CLIENT_COMMANDS[1], [self.current_user, video], self.server_address)
   
   def showLogin(self):
     self.clearBody()
@@ -210,7 +213,7 @@ class Interface:
       for user in group.users:
         self.createParagraph(self.body, user.id)
 
-      self.createBtn(self.body, "Reprouzir", self.showGroupOptions)
+      self.createBtn(self.body, "Reprouzir", self.playToGroup)
     
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
   
