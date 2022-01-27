@@ -44,6 +44,11 @@ class Interface:
     title["font"] = ("Arial", "40", "bold")
     title.pack()
 
+  def createParagraph(self, container, text):
+    title = Label(container, text=text)
+    title["font"] = ("Arial", "20")
+    title.pack()
+
   def createBtn(self, container, text, action, args=None): 
     action_with_arg = action
     if (args):
@@ -81,7 +86,7 @@ class Interface:
     user_id = self.user_id.get()
     user_kind = self.user_kind.get()
     
-    if user_id != None and user_kind != None:
+    if user_id != '':
       self.last_connection = 'TCP'
       user = User(user_id, user_kind)
       self.current_user = user
@@ -130,9 +135,14 @@ class Interface:
   
   def showStatus(self):
     self.clearBody()
-    self.createTitle(self.body, "ID:")
-    self.createTitle(self.body, "CATEGORIA")
-    self.createTitle(self.body, "GRUPO")
+    self.createTitle(self.body, "ID: "+self.current_user.id)
+    if self.current_user.kind == 0:
+      self.createTitle(self.body, "Tipo: Convidado")
+    else:
+      self.createTitle(self.body, "Tipo: Premium")
+    self.createTitle(self.body, "Grupo: ")
+    for id in self.current_user.group.user_ids:
+      self.createParagraph(self.body, id)
     self.createBtn(self.body, "Voltar", self.showOptions)
 
   def showGroupOptions(self):
@@ -147,7 +157,8 @@ class Interface:
     self.clearBody()
     self.createTitle(self.body, "NOVO GRUPO")
     self.createTitle(self.body, "NOME DO GRUPO")
-    newGroup = Entry(self.body).grid(row = 2,column = 0)
+    newGroup = Entry(self.body)
+    newGroup.pack()
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showGroup(self):
@@ -159,13 +170,13 @@ class Interface:
   def showAddUser(self):
     self.clearBody()
     self.createTitle(self.body, "ID DO USUÁRIO PARA ADICIONAR:")
-    addUser = Entry(self.body).grid(row = 1,column = 0)
+    addUser = Entry(self.body)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def showRemoveUser(self):
     self.clearBody()
     self.createTitle(self.body, "ID DO USUÁRIO PARA REMOVER:")
-    removeUser = Entry(self.body).grid(row = 1,column = 0)
+    removeUser = Entry(self.body)
     self.createBtn(self.body, "Voltar", self.showGroupOptions)
 
   def run(self):
